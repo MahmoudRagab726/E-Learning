@@ -8,9 +8,8 @@ public class Response implements Serializable {
     private String responseMessage;
     private String accessToken;
     private StudentInfo studentInfo;
-   /* private ContactInfo contactInfo;
-    private List<ContactInfo> contacts;
-*/
+    private CourseInfo courseInfo;
+    private List<CourseInfo> courses;
     public String getStatusCode() {
         return statusCode;
     }
@@ -42,20 +41,20 @@ public class Response implements Serializable {
     public void setStudentInfo(StudentInfo studentInfo) {
         this.studentInfo = studentInfo;
     }
-    /*
-    public ContactInfo getContactInfo() {
-        return contactInfo;
+
+    public CourseInfo getCourseInfo() {
+        return courseInfo;
     }
 
-    public void setContactInfo(ContactInfo contactInfo) {
-        this.contactInfo = contactInfo;
+    public void setCourseInfo(CourseInfo courseInfo) {
+        this.courseInfo = courseInfo;
     }
 
-    public List<ContactInfo> getContacts() {
-        return contacts;
+    public List<CourseInfo> getCourses() {
+        return courses;
     }
 
-    public void setContacts(List<ContactInfo> contacts) {
-        this.contacts = contacts;
-    }*/
+    public void setCourses(List<CourseInfo> courses) {
+        this.courses = courses;
+    }
 }

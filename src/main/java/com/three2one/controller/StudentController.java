@@ -37,7 +37,6 @@ public class StudentController {
     @RequestMapping(method = RequestMethod.POST , value = "/activate")
     public Response activateAccount(@RequestBody StudentInfo studentInfo){
         Response response = studentManager.activateAccount(studentInfo);
-        //response.setStatusCode(Enums.StatusCodes.SUCCESS.getCode());
         return response;
     }
 }

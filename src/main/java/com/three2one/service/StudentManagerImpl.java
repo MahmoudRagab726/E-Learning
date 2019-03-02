@@ -92,6 +92,7 @@ public class StudentManagerImpl implements StudentManager {
                 student.setStudentUserName(studentInfo.getStudentUserName());
                 student.setDOB(studentInfo.getDOB());
                 student.setGender(studentInfo.getGender());
+                student.setName(studentInfo.getName());
                 studentRepository.save(student);
                 emailService.sendEmailMessage(email, "OTP Code", "You can use this OTP to activate your account " + OTP);
             } else {

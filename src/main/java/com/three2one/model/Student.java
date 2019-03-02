@@ -6,6 +6,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import javax.persistence.*;
 import java.util.Collection;
 import java.util.Date;
+import java.util.Set;
 
 @Entity
 @Table(name = "Student")
@@ -32,6 +33,12 @@ public class Student implements UserDetails {
     private String activationCode;
     @Column(name = "Last_Modified_Date")
     private Date lastModifiedDate;
+    @ManyToMany
+    @JoinTable(name = "Student_Course",
+            joinColumns = @JoinColumn(name = "Course_Id", referencedColumnName = "Id"),
+            inverseJoinColumns = @JoinColumn(name = "Student_Id", referencedColumnName = "Id"))
+
+    private Set<Course> courses;
 
 
 
@@ -143,5 +150,13 @@ public class Student implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Set<Course> getCourses() {
+        return courses;
+    }
+
+    public void setCourses(Set<Course> courses) {
+        this.courses = courses;
     }
 }
