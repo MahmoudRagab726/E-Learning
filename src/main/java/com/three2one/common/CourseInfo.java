@@ -15,10 +15,11 @@ public class CourseInfo {
     public CourseInfo() {
     }
 
-    public CourseInfo(String name, String desc, Long studentId) {
+    public CourseInfo(String name, String desc, String instructor,String totalHours) {
         this.name = name;
         this.desc = desc;
-        this.studentId = studentId;
+        this.instructor = instructor;
+        this.totalHours = totalHours;
     }
 
     public Long getId() {

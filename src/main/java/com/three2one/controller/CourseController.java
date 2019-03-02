@@ -3,6 +3,8 @@ package com.three2one.controller;
 import com.three2one.common.CourseInfo;
 import com.three2one.common.CourseManager;
 import com.three2one.common.Response;
+import com.three2one.exception.MissingDataException;
+import com.three2one.exception.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,12 +15,12 @@ public class CourseController {
     CourseManager courseManager;
 
     @RequestMapping(value = "/course",method = RequestMethod.POST)
-    public Response addCourse(@RequestBody CourseInfo courseInfo){
+    public Response addCourse(@RequestBody CourseInfo courseInfo) throws MissingDataException {
         Response response = courseManager.addCourse(courseInfo);
         return response;
     }
     @RequestMapping(value = "/course",method = RequestMethod.PUT)
-    public Response updateCourse(@RequestBody CourseInfo courseInfo){
+    public Response updateCourse(@RequestBody CourseInfo courseInfo) throws NotFoundException, MissingDataException {
         Response response = courseManager.updateCourse(courseInfo);
         return response;
     }
@@ -28,7 +30,7 @@ public class CourseController {
         return response;
     }
     @RequestMapping(value = "/student/{studentId}/course/{courseId}",method = RequestMethod.GET)
-    public Response subscribeCourse(@PathVariable Long studentId,@PathVariable Long courseId){
+    public Response subscribeCourse(@PathVariable Long studentId,@PathVariable Long courseId) throws NotFoundException {
         Response response = courseManager.subscribeCourse(studentId,courseId);
         return response;
     }

@@ -5,6 +5,10 @@ import com.three2one.common.Response;
 import com.three2one.common.StudentInfo;
 import com.three2one.common.StudentManager;
 import com.three2one.component.EmailServiceImpl;
+import com.three2one.exception.AlreadyExistException;
+import com.three2one.exception.IncorrectDataException;
+import com.three2one.exception.InvalidFormatException;
+import com.three2one.exception.MissingDataException;
 import com.three2one.model.Student;
 import com.three2one.repository.StudentRepository;
 import com.three2one.security.AuthUserDetailsService;
@@ -52,42 +56,42 @@ public class StudentManagerImplTest {
             return new StudentManagerImpl();
         }
     }
-    @Test
+    @Test(expected = AlreadyExistException.class)
     public void signUpTestWhenTruToAddExistEmail() throws Exception{
         StudentInfo userInfo = new StudentInfo("Mahmoud Ragab","mahmoudragab760@gmail.com","mragab","Mahmoud123@5478","Mahmoud123@5478");
         given(studentRepository.findStudentByEmail(anyString())).willReturn(new Student());
         given(studentValidatorComponent.validateEmailExpression(anyString())).willReturn(true);
         given(studentValidatorComponent.validatePasswordExpression(anyString())).willReturn(true);
         Response response = studentManager.signUp(userInfo);
-        assertThat(response.getStatusCode()).isEqualTo(Enums.StatusCodes.STUDENT_ALREADY_EXIST.getCode());
+        //assertThat(response.getStatusCode()).isEqualTo(Enums.StatusCodes.ALREADY_EXIST.getCode());
     }
 
-    @Test
+    @Test(expected = InvalidFormatException.class)
     public void signUpTestWhenTruToAddInvalidMailFormat() throws Exception{
         StudentInfo userInfo = new StudentInfo("Mahmoud Ragab","mahmoudragab760@gmail.com","mragab","Mahmoud123@5478","Mahmoud123@5478");
         given(studentRepository.findStudentByEmail(anyString())).willReturn(new Student());
         given(studentValidatorComponent.validateEmailExpression(anyString())).willReturn(false);
         given(studentValidatorComponent.validatePasswordExpression(anyString())).willReturn(true);
         Response response = studentManager.signUp(userInfo);
-        assertThat(response.getStatusCode()).isEqualTo(Enums.StatusCodes.INVALID_EMAIL_FORMAT.getCode());
+       // assertThat(response.getStatusCode()).isEqualTo(Enums.StatusCodes.INVALID_FORMAT.getCode());
     }
-    @Test
+    @Test(expected = InvalidFormatException.class)
     public void signUpTestWhenTruToAddInvalidPasswordFormat() throws Exception{
         StudentInfo userInfo = new StudentInfo("Mahmoud Ragab","mahmoudragab760@gmail.com","mragab","Mahmoud123@5478","Mahmoud123@5478");
         given(studentRepository.findStudentByEmail(anyString())).willReturn(new Student());
         given(studentValidatorComponent.validateEmailExpression(anyString())).willReturn(true);
         given(studentValidatorComponent.validatePasswordExpression(anyString())).willReturn(false);
         Response response = studentManager.signUp(userInfo);
-        assertThat(response.getStatusCode()).isEqualTo(Enums.StatusCodes.INVALID_PASSWORD_FORMAT.getCode());
+        //assertThat(response.getStatusCode()).isEqualTo(Enums.StatusCodes.INVALID_FORMAT.getCode());
     }
-    @Test
+    @Test(expected = IncorrectDataException.class)
     public void signUpTestWhenTruToAddUnmatchedPasswords() throws Exception{
         StudentInfo userInfo = new StudentInfo("Mahmoud Ragab","mahmoudragab760@gmail.com","mragab","Mahmoud123@547","Mahmoud123@5478");
         given(studentRepository.findStudentByEmail(anyString())).willReturn(null);
         given(studentValidatorComponent.validateEmailExpression(anyString())).willReturn(true);
         given(studentValidatorComponent.validatePasswordExpression(anyString())).willReturn(true);
         Response response = studentManager.signUp(userInfo);
-        assertThat(response.getStatusCode()).isEqualTo(Enums.StatusCodes.PASSWORD_NOT_MATCH_CONFIRMED_PASSWORD.getCode());
+       // assertThat(response.getStatusCode()).isEqualTo(Enums.StatusCodes.IN_CORRECT_DATA.getCode());
     }
     @Test
     public void signUpTestWhenTryToAddSuccessData() throws Exception{

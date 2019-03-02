@@ -6,6 +6,7 @@ import com.three2one.common.Response;
 import com.three2one.common.StudentInfo;
 import com.three2one.common.StudentManager;
 import com.three2one.component.EmailServiceImpl;
+import com.three2one.exception.*;
 import com.three2one.model.Student;
 import com.three2one.repository.StudentRepository;
 import com.three2one.security.AuthUserDetailsService;
@@ -41,30 +42,24 @@ public class StudentManagerImpl implements StudentManager {
     StudentValidatorComponent studentValidator;
 
     @Override
-    public Response login(StudentInfo studentInfo) {
+    public Response login(StudentInfo studentInfo) throws GeneralFailureException {
         final Authentication authentication = authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(studentInfo.getEmail(),studentInfo.getPassword())
         );
 
         Response response = new Response();
-        try {
-            UserDetails userDetails= authUserDetailsService.loadUserByUsername(studentInfo.getEmail());
-            response.setStatusCode(StatusCodes.SUCCESS.getCode());
-            response.setAccessToken(tokenUtil.generateToken(userDetails));
-        }catch (Exception e){
-            response.setStatusCode(StatusCodes.STUDENT_DOES_NOT_EXIST.getCode());
-            return response;
-        }
+        UserDetails userDetails= authUserDetailsService.loadUserByUsername(studentInfo.getEmail());
+        response.setStatusCode(StatusCodes.SUCCESS.getCode());
+        response.setAccessToken(tokenUtil.generateToken(userDetails));
         Student student =studentRepository.findStudentByEmail(studentInfo.getEmail());
         if(student.getStatus()==StudentStatus.INACTIVE.ordinal()){
-            response = new Response();
-            response.setStatusCode(StatusCodes.INACTIVE_STUDENT.getCode());
+            throw new InactiveCustomerException("User is inactive");
         }
         return response;
     }
 
     @Override
-    public Response signUp(StudentInfo studentInfo) throws MessagingException {
+    public Response signUp(StudentInfo studentInfo) throws MessagingException,GeneralFailureException {
         Response response =new Response();
         response.setStudentInfo(studentInfo);
 
@@ -74,14 +69,11 @@ public class StudentManagerImpl implements StudentManager {
         String confirmedPassword = studentInfo.getConfirmedPassword();
         String OTP = generateOTP()+"";
         if (!studentValidator.validateEmailExpression(email)){
-            response.setStatusCode(Enums.StatusCodes.INVALID_EMAIL_FORMAT.getCode());
-            return response;
+            throw new InvalidFormatException("Invalid email format");
         }else if(!studentValidator.validatePasswordExpression(password)){
-            response.setStatusCode(Enums.StatusCodes.INVALID_PASSWORD_FORMAT.getCode());
-            return response;
+            throw new InvalidFormatException("Invalid password format");
         }else if (!isPasswordMatches(password,confirmedPassword)){
-            response.setStatusCode(Enums.StatusCodes.PASSWORD_NOT_MATCH_CONFIRMED_PASSWORD.getCode());
-            return response;
+            throw new IncorrectDataException("Password not match confirmed password");
         }else {
             if (!isStudentExist(studentInfo.getEmail())) {
                 student.setEmail(email);
@@ -96,8 +88,7 @@ public class StudentManagerImpl implements StudentManager {
                 studentRepository.save(student);
                 emailService.sendEmailMessage(email, "OTP Code", "You can use this OTP to activate your account " + OTP);
             } else {
-                response.setStatusCode(Enums.StatusCodes.STUDENT_ALREADY_EXIST.getCode());
-                return response;
+                throw new AlreadyExistException("Student already exist");
             }
         }
         studentInfo.setStudentId(student.getId());
@@ -106,22 +97,22 @@ public class StudentManagerImpl implements StudentManager {
     }
 
     @Override
-    public Response activateAccount(StudentInfo studentInfo) {
+    public Response activateAccount(StudentInfo studentInfo) throws GeneralFailureException {
         Response response = new Response();
         Student student = studentRepository.findStudentByEmail(studentInfo.getEmail());
         if (student!=null){
             if(studentInfo.getActivationCode().equals(student.getActivationCode())){
                 student.setStatus(StudentStatus.ACTIVE.ordinal());
+                student.setLastModifiedDate(new Date());
                 studentRepository.save(student);
             }else {
-                response.setStatusCode(StatusCodes.IN_CORRECT_ACTIVATION_CODE.getCode());
-                return response;
+                throw new IncorrectDataException("Wrong activation code");
             }
         }else {
-            response.setStatusCode(StatusCodes.STUDENT_DOES_NOT_EXIST.getCode());
-            return response;
+            throw new NotFoundException("User not found");
         }
         response.setStatusCode(StatusCodes.SUCCESS.getCode());
+
         return response;
     }
 

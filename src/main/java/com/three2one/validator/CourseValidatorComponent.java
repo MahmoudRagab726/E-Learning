@@ -9,13 +9,13 @@ public class CourseValidatorComponent {
 
     public void validateCourseInfo(CourseInfo courseInfo) throws MissingDataException {
             if(isEmptyOrNull(courseInfo.getName())){
-                throw new MissingDataException();
+                throw new MissingDataException("Name is missing");
             }else if (isEmptyOrNull(courseInfo.getDesc())){
-                throw new MissingDataException();
+                throw new MissingDataException("Description is missing");
             }else if(isEmptyOrNull(courseInfo.getInstructor())){
-                throw new MissingDataException();
+                throw new MissingDataException("Instructor is missing");
             }else if(isEmptyOrNull(courseInfo.getTotalHours())){
-                throw new MissingDataException();
+                throw new MissingDataException("Total hours is missing");
             }
     }
 

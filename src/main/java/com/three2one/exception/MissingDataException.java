@@ -1,14 +1,17 @@
 package com.three2one.exception;
 
-public class MissingDataException extends Exception {
-    public MissingDataException() {
-    }
+import com.three2one.common.Enums.*;
+
+public class MissingDataException extends GeneralFailureException {
 
     public MissingDataException(String message) {
         super(message);
     }
 
-    public MissingDataException(String message, Throwable cause) {
-        super(message, cause);
+    @Override
+    public StatusCodes getStatusCode() {
+        return StatusCodes.MISSING_DATA;
     }
+
+
 }

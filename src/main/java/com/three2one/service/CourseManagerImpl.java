@@ -30,15 +30,9 @@ public class CourseManagerImpl implements CourseManager {
     StudentRepository studentRepository;
 
     @Override
-    public Response addCourse(CourseInfo courseInfo) {
+    public Response addCourse(CourseInfo courseInfo) throws MissingDataException {
         Response response = new Response();
-        try {
-            validatorComponent.validateCourseInfo(courseInfo);
-        }catch (MissingDataException e){
-            response.setStatusCode(Enums.StatusCodes.MISSING_DATA.getCode());
-            return response;
-        }
-
+        validatorComponent.validateCourseInfo(courseInfo);
         Course course =new Course();
         course.setName(courseInfo.getName());
         course.setDesc(courseInfo.getDesc());
@@ -54,25 +48,14 @@ public class CourseManagerImpl implements CourseManager {
     }
 
     @Override
-    public Response updateCourse(CourseInfo courseInfo) {
+    public Response updateCourse(CourseInfo courseInfo) throws NotFoundException, MissingDataException {
         Response response = new Response();
-        try{
-            Course course = courseRepository.findCourseById(courseInfo.getId());
-            if (course==null){
-                throw new NotFoundException();
-            }
-            validatorComponent.validateCourseInfo(courseInfo);
-        }catch (MissingDataException e){
-            response.setStatusCode(Enums.StatusCodes.MISSING_DATA.getCode());
-            return response;
-        }catch (NotFoundException e){
-            response.setStatusCode(Enums.StatusCodes.COURSE_DOES_NOT_EXIST.getCode());
-            return response;
-        }catch (Exception e){
-            response.setStatusCode(Enums.StatusCodes.GENERAL_FAILURE.getCode());
-            return response;
+        Course course = courseRepository.findCourseById(courseInfo.getId());
+        if (course==null){
+            throw new NotFoundException("Course not found");
         }
-        Course course =new Course();
+        validatorComponent.validateCourseInfo(courseInfo);
+        course =new Course();
         course.setId(courseInfo.getId());
         course.setName(courseInfo.getName());
         course.setDesc(courseInfo.getDesc());
@@ -88,18 +71,13 @@ public class CourseManagerImpl implements CourseManager {
     @Override
     public Response deleteCourse(Long courseId) {
         Response response = new Response();
-        try {
-            courseRepository.deleteById(courseId);
-        }catch(NullPointerException e){
-            response.setStatusCode(Enums.StatusCodes.FAILED_TO_DELETE.getCode());
-            return response;
-        }
+        courseRepository.deleteById(courseId);
         response.setStatusCode(Enums.StatusCodes.SUCCESS.getCode());
         return response;
     }
 
     @Override
-    public Response subscribeCourse(Long studentId ,Long courseId) {
+    public Response subscribeCourse(Long studentId ,Long courseId) throws NotFoundException {
         Response response = new Response();
         Student student = studentRepository.findStudentById(studentId);
         Course course =courseRepository.findCourseById(courseId);
@@ -109,8 +87,7 @@ public class CourseManagerImpl implements CourseManager {
             student.setCourses(courses);
             studentRepository.save(student);
         }else {
-            response.setStatusCode(Enums.StatusCodes.MISSING_DATA.getCode());
-            return response;
+            throw new NotFoundException("Student Or Course Not Found");
         }
         response.setStatusCode(Enums.StatusCodes.SUCCESS.getCode());
         return response;
