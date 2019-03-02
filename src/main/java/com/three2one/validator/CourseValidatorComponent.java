@@ -12,7 +12,9 @@ public class CourseValidatorComponent {
                 throw new MissingDataException();
             }else if (isEmptyOrNull(courseInfo.getDesc())){
                 throw new MissingDataException();
-            }else if(courseInfo.getStudentId()==null){
+            }else if(isEmptyOrNull(courseInfo.getInstructor())){
+                throw new MissingDataException();
+            }else if(isEmptyOrNull(courseInfo.getTotalHours())){
                 throw new MissingDataException();
             }
     }
